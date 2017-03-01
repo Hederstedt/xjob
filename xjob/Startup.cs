@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using xjob.Data;
 using xjob.Models;
 using xjob.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace xjob
 {
@@ -47,8 +48,11 @@ namespace xjob
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddMvc();
-
+            services.AddMvc(options =>
+            {
+                options.SslPort = 44321;
+                options.Filters.Add(new RequireHttpsAttribute());
+            });
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
