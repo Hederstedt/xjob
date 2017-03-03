@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 using xjob.Models;
 using xjob.Models.AccountViewModels;
 using xjob.Services;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace xjob.Controllers
 {
@@ -66,7 +68,7 @@ namespace xjob.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
@@ -112,7 +114,27 @@ namespace xjob.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                /*                
+                 * string fileName = HttpContext.Server.MapPath(@"~/Images/noImg.png");
+  
+                byte[] imageData = null;
+                FileInfo fileInfo = new FileInfo(fileName);
+                long imageFileLength = fileInfo.Length;
+                FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                BinaryReader br = new BinaryReader(fs);
+                imageData = br.ReadBytes((int)imageFileLength);                 
+                return File(imageData, "image/png"); */
+
+         
+
+
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email};
+                using (var memorystream = new MemoryStream())
+                {
+                    await model.AvatarImage.CopyToAsync(memorystream);
+                    user.ProfilePic = memorystream.ToArray();
+                }
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
