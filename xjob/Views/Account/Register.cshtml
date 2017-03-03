@@ -38,10 +38,10 @@
         </div>
     </div>
     <div class="form-group">
-        <label asp-for="AvatarImage" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <img src="@Url.Action("ProfilePic", "Home")" class="profilePic"/>
-            <input asp-for="AvatarImage" class="form-control" accept=".png, .jpg, .jpeg, .gif, .tif" />
+        <label asp-for="AvatarImage" class="col-md-2 control-label"><img src="@Url.Action("ProfilePic", "Home")" class="profilePic"/></label>
+        <div class="col-md-10 inputremove">
+            @*<img src="@Url.Action("ProfilePic", "Home")" class="profilePic"/>*@
+            <input asp-for="AvatarImage" class="profilePic" type="file" typeof="file" accept=".png, .jpg, .jpeg, .gif, .tif" alt="Submit feedback" />
         </div>
     </div>
     <div class="form-group">

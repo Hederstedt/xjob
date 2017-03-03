@@ -14,11 +14,13 @@ namespace xjob.Controllers
     public class HomeController : Controller
     {
         private IHostingEnvironment _environment;
-        private UserManager<ApplicationUser> userManager;
+        private UserManager<ApplicationUser> _userManager;
 
-        public HomeController(IHostingEnvironment environment)
+        public HomeController(IHostingEnvironment environment, UserManager<ApplicationUser> userManager)
         {
             _environment = environment;
+            _userManager = userManager;
+            
         }
         public IActionResult Index()
         {
@@ -48,22 +50,22 @@ namespace xjob.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var userID = userManager.GetUserId(User);
+                var userID = _userManager.GetUserId(User);
                 if (userID == null)
                 {
-                    string fileName = Path.Combine(_environment.WebRootPath, "/images/placeholderpic.png");
-                    byte[] imageData = null;
-                    FileInfo fileInfo = new FileInfo(fileName);
-                    long imageLength = fileInfo.Length;
-                    FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                    BinaryReader br = new BinaryReader(fs);
-                    imageData = br.ReadBytes((int)imageLength);
-                    return File(imageData, "image/png");
+                   
                 }
-                var u = userManager.Users.Where(x => x.Id == userID).SingleOrDefault();
+                var u = _userManager.Users.Where(x => x.Id == userID).SingleOrDefault();
                 return File(u.ProfilePic, "image/png");
             }
-            return View();
+            string fileName = Path.Combine(_environment.WebRootPath, "images/placeholderpic.png");
+            byte[] imageData = null;
+            FileInfo fileInfo = new FileInfo(fileName);
+            long imageLength = fileInfo.Length;
+            FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            BinaryReader br = new BinaryReader(fs);
+            imageData = br.ReadBytes((int)imageLength);
+            return File(imageData, "image/png");
         }
     }
 }

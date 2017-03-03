@@ -47,7 +47,9 @@ textarea {
     border: solid 2px;
     border-radius: 6px;
 }
-
+.inputremove > input {
+    display:none;
+}
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
     /* Hide captions */
