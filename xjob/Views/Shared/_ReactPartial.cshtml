@@ -1,0 +1,18 @@
+@using Microsoft.AspNetCore.Identity
+
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div>
+        <h2>Hello React åäö</h2>
+        <div id="content"></div>
+    </div>
+}
+else
+{<div>
+    <h2 lang="sv">Du måste logga in för att detta skall synas </h2>
+    <span>åäö funkar inte detta här ?</span>
+</div>
+}

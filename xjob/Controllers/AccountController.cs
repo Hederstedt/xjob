@@ -114,20 +114,6 @@ namespace xjob.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                /*                
-                 * string fileName = HttpContext.Server.MapPath(@"~/Images/noImg.png");
-  
-                byte[] imageData = null;
-                FileInfo fileInfo = new FileInfo(fileName);
-                long imageFileLength = fileInfo.Length;
-                FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                BinaryReader br = new BinaryReader(fs);
-                imageData = br.ReadBytes((int)imageFileLength);                 
-                return File(imageData, "image/png"); */
-
-         
-
-
                 var user = new ApplicationUser { UserName = model.UserName, Email = model.Email};
                 using (var memorystream = new MemoryStream())
                 {

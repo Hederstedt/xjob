@@ -40,7 +40,6 @@
     <div class="form-group">
         <label asp-for="AvatarImage" class="col-md-2 control-label"><img src="@Url.Action("ProfilePic", "Home")" class="profilePic"/></label>
         <div class="col-md-10 inputremove">
-            @*<img src="@Url.Action("ProfilePic", "Home")" class="profilePic"/>*@
             <input asp-for="AvatarImage" class="profilePic" type="file" typeof="file" accept=".png, .jpg, .jpeg, .gif, .tif" alt="Submit feedback" />
         </div>
     </div>
