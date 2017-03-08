@@ -7,3 +7,4 @@ matrix:
       mono: none
       env: DOTNETCORE=1
     - mono: latest
+sudo: required
