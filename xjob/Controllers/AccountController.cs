@@ -14,6 +14,8 @@ using xjob.Models.AccountViewModels;
 using xjob.Services;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using xjob.Classes;
+using System.Net;
 
 namespace xjob.Controllers
 {
@@ -177,6 +179,7 @@ namespace xjob.Controllers
                 return View(nameof(Login));
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
+            
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
@@ -203,7 +206,12 @@ namespace xjob.Controllers
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
+                if (info.LoginProvider == "Facebook")
+                {
+                    var img = "http://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500";
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, previewPic = img});
+                }
+                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email});
             }
         }
 
@@ -222,7 +230,30 @@ namespace xjob.Controllers
                 {
                     return View("ExternalLoginFailure");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+                if (model.AvatarImage == null && info.LoginProvider == "Facebook")
+                {
+                    string respons;
+                    WebRequest req = WebRequest.Create(
+                      "http://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500");
+                    WebResponse resp = await req.GetResponseAsync();
+                    using (Stream st = resp.GetResponseStream())
+                    {
+                        StreamReader reader = new StreamReader(st);
+                        respons = await reader.ReadToEndAsync();
+                    } 
+                    byte[] imageData = respons.CreatePlaceHolder();
+                    user.ProfilePic = imageData;
+                }
+                else if (model.AvatarImage != null)                               
+                {
+                    using (var memorystream = new MemoryStream())
+                    {
+                        await model.AvatarImage.CopyToAsync(memorystream);
+                        user.ProfilePic = memorystream.ToArray();
+                    }
+                }
+               
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {

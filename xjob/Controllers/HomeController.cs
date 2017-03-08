@@ -8,6 +8,7 @@ using System.IO;
 using xjob.Data;
 using Microsoft.AspNetCore.Identity;
 using xjob.Models;
+using xjob.Classes;
 
 namespace xjob.Controllers
 {
@@ -48,19 +49,24 @@ namespace xjob.Controllers
 
         public IActionResult ProfilePic()
         {
+            string fileName = Path.Combine(_environment.WebRootPath, "images/placeholderpic.png");
+            byte[] imageData = null;
             if (User.Identity.IsAuthenticated)
             {
                 var userID = _userManager.GetUserId(User);
                 if (userID == null)
                 {
-                    return File(CreatePlaceHolder(), "image/png");
+                    
+                    imageData = fileName.CreatePlaceHolder();
+                    return File(imageData, "image/png");
                 }
                 else
                 {
                     var u = _userManager.Users.Where(x => x.Id == userID).SingleOrDefault();
                     if (u.ProfilePic == null)
                     {
-                        return File(CreatePlaceHolder(), "image/png");
+                        imageData = fileName.CreatePlaceHolder();
+                        return File(imageData, "image/png");
                     }
                     else
                     {
@@ -70,22 +76,9 @@ namespace xjob.Controllers
                 }
 
             }
-
-            return File(CreatePlaceHolder(), "image/png");
+            imageData = fileName.CreatePlaceHolder();
+            return File(imageData, "image/png");
         }
 
-        public byte[] CreatePlaceHolder()
-        {
-            string fileName = Path.Combine(_environment.WebRootPath, "images/placeholderpic.png");
-            byte[] imageData = null;
-            FileInfo fileInfo = new FileInfo(fileName);
-            long imageLength = fileInfo.Length;
-            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-            {
-                BinaryReader br = new BinaryReader(fs);
-                imageData = br.ReadBytes((int)imageLength);
-            };
-            return imageData;
-        }
     }
 }

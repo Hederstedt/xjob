@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace xjob.Models.AccountViewModels
 {
     public class RegisterViewModel
-    {
-      
+    {     
         [Required]
         [Display(Name = "UserName")]
         public string UserName { get; set; }
