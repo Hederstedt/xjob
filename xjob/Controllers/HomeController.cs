@@ -20,7 +20,7 @@ namespace xjob.Controllers
         {
             _environment = environment;
             _userManager = userManager;
-            
+
         }
         public IActionResult Index()
         {
@@ -53,19 +53,39 @@ namespace xjob.Controllers
                 var userID = _userManager.GetUserId(User);
                 if (userID == null)
                 {
-                   
+                    return File(CreatePlaceHolder(), "image/png");
                 }
-                var u = _userManager.Users.Where(x => x.Id == userID).SingleOrDefault();
-                return File(u.ProfilePic, "image/png");
+                else
+                {
+                    var u = _userManager.Users.Where(x => x.Id == userID).SingleOrDefault();
+                    if (u.ProfilePic == null)
+                    {
+                        return File(CreatePlaceHolder(), "image/png");
+                    }
+                    else
+                    {
+                        return File(u.ProfilePic, "image/png");
+                    }
+
+                }
+
             }
+
+            return File(CreatePlaceHolder(), "image/png");
+        }
+
+        public byte[] CreatePlaceHolder()
+        {
             string fileName = Path.Combine(_environment.WebRootPath, "images/placeholderpic.png");
             byte[] imageData = null;
             FileInfo fileInfo = new FileInfo(fileName);
             long imageLength = fileInfo.Length;
-            FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(fs);
-            imageData = br.ReadBytes((int)imageLength);
-            return File(imageData, "image/png");
+            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            {
+                BinaryReader br = new BinaryReader(fs);
+                imageData = br.ReadBytes((int)imageLength);
+            };
+            return imageData;
         }
     }
 }
