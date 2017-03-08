@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace xjob.Classes
+namespace xjob.HelperClasses
 {
     public static class PictureHelper
     {

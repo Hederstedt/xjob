@@ -8,7 +8,7 @@ using System.IO;
 using xjob.Data;
 using Microsoft.AspNetCore.Identity;
 using xjob.Models;
-using xjob.Classes;
+using xjob.HelperClasses;
 
 namespace xjob.Controllers
 {

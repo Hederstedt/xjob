@@ -14,8 +14,9 @@ using xjob.Models.AccountViewModels;
 using xjob.Services;
 using System.IO;
 using Microsoft.AspNetCore.Http;
-using xjob.Classes;
+using xjob.HelperClasses;
 using System.Net;
+using System.Net.Http;
 
 namespace xjob.Controllers
 {
@@ -207,8 +208,8 @@ namespace xjob.Controllers
                 ViewData["LoginProvider"] = info.LoginProvider;
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 if (info.LoginProvider == "Facebook")
-                {
-                    var img = "http://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500";
+                {                 
+                    var img = "https://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500";
                     return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, previewPic = img});
                 }
                 return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email});
@@ -233,17 +234,12 @@ namespace xjob.Controllers
                 var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
                 if (model.AvatarImage == null && info.LoginProvider == "Facebook")
                 {
-                    string respons;
-                    WebRequest req = WebRequest.Create(
-                      "http://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500");
-                    WebResponse resp = await req.GetResponseAsync();
-                    using (Stream st = resp.GetResponseStream())
+                    HttpResponseMessage respone = await ApiHelper.client.GetAsync("https://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500");
+                    if (respone.IsSuccessStatusCode)
                     {
-                        StreamReader reader = new StreamReader(st);
-                        respons = await reader.ReadToEndAsync();
-                    } 
-                    byte[] imageData = respons.CreatePlaceHolder();
-                    user.ProfilePic = imageData;
+                        user.ProfilePic = await respone.Content.ReadAsByteArrayAsync();
+                    }
+                   
                 }
                 else if (model.AvatarImage != null)                               
                 {
