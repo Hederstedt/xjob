@@ -1,4 +1,9 @@
-solution: solution-xjob.sln
 language: csharp
-mono: none
-dotnet: 1.0.0-preview2-003121
+solution: travis-mono-test.sln
+
+matrix:
+  include:
+    - dotnet: 1.0.0-preview2-003121
+      mono: none
+      env: DOTNETCORE=1
+    - mono: latest
