@@ -116,7 +116,12 @@ namespace xjob
                 ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
                 ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"]
             });
-
+            //Facebook
+            app.UseGoogleAuthentication(new GoogleOptions()
+            {
+                ClientId = Configuration["Authentication:Google:ClientId"],
+                ClientSecret = Configuration["Authentication:Google:ClientSecret"]
+            });
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

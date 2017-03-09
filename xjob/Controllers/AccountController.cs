@@ -117,7 +117,7 @@ namespace xjob.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email};
+                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
                 using (var memorystream = new MemoryStream())
                 {
                     await model.AvatarImage.CopyToAsync(memorystream);
@@ -180,7 +180,7 @@ namespace xjob.Controllers
                 return View(nameof(Login));
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            
+
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
@@ -207,18 +207,29 @@ namespace xjob.Controllers
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var userName = info.Principal.FindFirstValue(ClaimTypes.Name);                
+                string previewPicUrl = "~/wwwroot/images/placeholderpic.png";
                 if (info.LoginProvider == "Facebook")
-                {                 
-                    var img = "https://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500";
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, previewPic = img});
+                {
+                    previewPicUrl = "https://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500";
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, previewPic = previewPicUrl });
                 }
                 if (info.LoginProvider == "Twitter")
-                {//TEmp id user_id=2246763891                                    
-                    var userName = info.Principal.FindFirstValue(ClaimTypes.Name);
-                    string temp = "https://twitter.com/"+userName+"/profile_image?size=original";
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = userName, previewPic = temp });
+                {
+                    previewPicUrl = "https://twitter.com/" + userName + "/profile_image?size=original";
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = userName, previewPic = previewPicUrl });
                 }
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email});
+                if (info.LoginProvider == "Google")
+                {//temp 105725827089012424846
+
+                    previewPicUrl = "https://plus.google.com/s2/photos/profile/me";
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = userName, Email = email, previewPic = previewPicUrl });
+                }
+                else
+                {
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
+                }
+
             }
         }
 
@@ -245,17 +256,25 @@ namespace xjob.Controllers
                     {
                         user.ProfilePic = await respone.Content.ReadAsByteArrayAsync();
                     }
-                   
+
                 }
                 if (model.AvatarImage == null && info.LoginProvider == "Twitter")
                 {
-                    HttpResponseMessage respone = await ApiHelper.client.GetAsync("https://twitter.com/"+model.UserName+"/profile_image?size=original");
+                    HttpResponseMessage respone = await ApiHelper.client.GetAsync("https://twitter.com/" + model.UserName + "/profile_image?size=original");
                     if (respone.IsSuccessStatusCode)
                     {
                         user.ProfilePic = await respone.Content.ReadAsByteArrayAsync();
                     }
                 }
-                else if (model.AvatarImage != null)                               
+                if (model.AvatarImage == null && info.LoginProvider == "Google")
+                {
+                    HttpResponseMessage respone = await ApiHelper.client.GetAsync("https://www.googleapis.com/plus/v1/people/"+info.ProviderKey+ "?fields=image&key=AIzaSyBvcRs9rAZFYtCRWGtJIIfVMSfXOL8bP2I");
+                    if (respone.IsSuccessStatusCode)
+                    {
+                        user.ProfilePic = await respone.Content.ReadAsByteArrayAsync();
+                    }
+                }
+                else if (model.AvatarImage != null)
                 {
                     using (var memorystream = new MemoryStream())
                     {
@@ -263,7 +282,7 @@ namespace xjob.Controllers
                         user.ProfilePic = memorystream.ToArray();
                     }
                 }
-               
+
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
