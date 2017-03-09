@@ -212,6 +212,12 @@ namespace xjob.Controllers
                     var img = "https://graph.facebook.com/" + info.ProviderKey + "/picture?type=large&redirect=true&width=500&height=500";
                     return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email, previewPic = img});
                 }
+                if (info.LoginProvider == "Twitter")
+                {//TEmp id user_id=2246763891                                    
+                    var userName = info.Principal.FindFirstValue(ClaimTypes.Name);
+                    string temp = "https://twitter.com/"+userName+"/profile_image?size=original";
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = userName, previewPic = temp });
+                }
                 return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email});
             }
         }
@@ -240,6 +246,14 @@ namespace xjob.Controllers
                         user.ProfilePic = await respone.Content.ReadAsByteArrayAsync();
                     }
                    
+                }
+                if (model.AvatarImage == null && info.LoginProvider == "Twitter")
+                {
+                    HttpResponseMessage respone = await ApiHelper.client.GetAsync("https://twitter.com/"+model.UserName+"/profile_image?size=original");
+                    if (respone.IsSuccessStatusCode)
+                    {
+                        user.ProfilePic = await respone.Content.ReadAsByteArrayAsync();
+                    }
                 }
                 else if (model.AvatarImage != null)                               
                 {
