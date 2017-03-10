@@ -49,7 +49,7 @@
                     <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Registrera som ny användare här</a>
                 </p>
                 <p>
-                    <a asp-action="ForgotPassword">Glömt ditt lösenord? ingen fara klicka här</a>
+                    <a asp-action="ForgotPassword" class="btn btn-default">Glömt ditt lösenord? ingen fara klicka här</a>
                 </p>
             </form>
         </section>
@@ -76,7 +76,28 @@
                             <p>
                                 @foreach (var provider in loginProviders)
                                 {
-                                    <button type="submit" class="btn btn-default" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">@provider.AuthenticationScheme</button>
+                                    if (provider.DisplayName == "Facebook")
+                                    {
+                                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">
+                                            <i class="fa fa-facebook-official"></i>
+                                            @provider.AuthenticationScheme
+                                        </button>
+                                    }
+                                    if (provider.DisplayName == "Twitter")
+                                    {
+                                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">
+                                            <i class="fa fa-twitter"></i>
+                                            @provider.AuthenticationScheme
+                                        </button>
+                                    }
+                                    if (provider.DisplayName == "Google")
+                                    {
+                                        <button type="submit" class="btn btn-danger" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">
+                                            <i class="fa fa-google-plus-official"></i>
+                                            @provider.AuthenticationScheme
+                                        </button>
+                                    }
+
                                 }
                             </p>
                         </div>
