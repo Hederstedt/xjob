@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace xjob.Models
+﻿namespace xjob.Models
 {
     public class CommentModel
     {
